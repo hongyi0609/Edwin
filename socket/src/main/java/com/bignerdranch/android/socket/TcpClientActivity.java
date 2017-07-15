@@ -141,6 +141,7 @@ public class TcpClientActivity extends Activity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        // 网络操作，不能直接在主线程，否则会报网络在主线程异常，任玉刚这里遗漏了
                         mPrintWriter.println(msg);
                     }
                 }).start();

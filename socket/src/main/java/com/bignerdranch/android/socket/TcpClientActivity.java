@@ -1,15 +1,23 @@
 package com.bignerdranch.android.socket;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -28,10 +36,12 @@ public class TcpClientActivity extends Activity {
 
     private static final int MESSAGE_RECEIVE_NEW_MSG = 1;
     private static final int MESSAGE_SOCKET_CONNECTED = 2;
+    private static final String TAG = TcpClientActivity.class.getSimpleName();
 
     private Button mSendButton;
     private TextView mMessageTextView;
     private EditText mMessageEditText;
+    private WebView mWebView;
 
     private PrintWriter mPrintWriter;
     private Socket mClientSocket;
@@ -72,6 +82,37 @@ public class TcpClientActivity extends Activity {
                 connectTcpServer();
             }
         }.start();
+
+        mWebView = (WebView) findViewById(R.id.webview_test);
+
+        WebSettings webSettings = mWebView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
+        mWebView.loadUrl("http://blog.csdn.net");
+
+        mWebView.setWebViewClient(new WebViewClient(){
+            @SuppressWarnings("deprecation")
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                return super.shouldOverrideUrlLoading(view, url);
+                if("blog.csdn.net".equals(Uri.parse(url).getHost())){
+                    view.loadUrl("https://www.baidu.com");
+                }
+                return true;
+            }
+
+            @TargetApi(Build.VERSION_CODES.N)
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+//                return super.shouldOverrideUrlLoading(view, request);
+                Log.d(TAG, "request.getUrl = " + request.getUrl() +
+                "," + Uri.parse(request.getUrl().toString()).getHost());
+                if("m.blog.csdn.net".equals(Uri.parse(request.getUrl().toString()).getHost())){
+                    view.loadUrl("https://www.baidu.com");
+                }
+                return true;
+            }
+        });
     }
 
     @Override

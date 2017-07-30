@@ -111,16 +111,19 @@ public class TcpClientActivity extends Activity {
                 Log.d(TAG, "userAgent = " + userAgent);
                 if (userAgent.substring(userAgent.length()-";iSnow".length()).equals(";iSnow")){
                     Log.d(TAG, "userAgent >>>>>>>>>>>>>> ##########");
-                    view.getSettings().setUserAgentString(userAgent.substring(userAgent.length()-";iSnow".length()));
-                    view.loadUrl("http://blog.csdn.net");
-                    return true;
-                }
-                Log.d(TAG, "request.getUrl = " + request.getUrl() +
-                "," + Uri.parse(request.getUrl().toString()).getHost());
-                if("m.blog.csdn.net".equals(Uri.parse(request.getUrl().toString()).getHost())){
+                    view.getSettings().setUserAgentString(userAgent.substring(0, userAgent.length()-";iSnow".length()));
                     view.loadUrl("https://www.baidu.com");
+                    return false;
                 }
-                return true;
+                /**
+                 * 如下方案无法解决拦截Url时出现的重定向问题 <br />
+                 * */
+//                Log.d(TAG, "request.getUrl = " + request.getUrl() +
+//                "," + Uri.parse(request.getUrl().toString()).getHost());
+//                if("m.blog.csdn.net".equals(Uri.parse(request.getUrl().toString()).getHost())){
+//                    view.loadUrl("https://www.baidu.com");
+//                }
+                return false;
             }
         });
     }

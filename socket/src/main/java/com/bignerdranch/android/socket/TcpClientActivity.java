@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -125,8 +127,45 @@ public class TcpClientActivity extends Activity {
 //                }
                 return false;
             }
+
+            @SuppressWarnings("deprecation")
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                WebResourceResponse response = null;
+                if (url.contains("logo")) {
+                    try {
+                        InputStream logo = getAssets().open("logo.png");
+                        response = new WebResourceResponse("image/png", "UTF-8", logo);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return response;
+            }
+
+            @TargetApi(Build.VERSION_CODES.N)
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                /**
+                 * 实现Android N 拦截网页logo功能<br />
+                 * 比如拦截百度的熊掌logo<br />
+                 * */
+                WebResourceResponse response = null;
+                String url = request.getUrl().toString();
+                if (url.contains("logo")) {
+                    try {
+                        InputStream logo = getAssets().open("logo.png");
+                        response = new WebResourceResponse("image/png", "UTF-8", logo);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return response;
+            }
         });
     }
+
+
 
     @Override
     protected void onDestroy() {

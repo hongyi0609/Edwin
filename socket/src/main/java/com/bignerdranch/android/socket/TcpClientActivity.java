@@ -87,6 +87,8 @@ public class TcpClientActivity extends Activity {
 
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        String ua = webSettings.getUserAgentString();
+        webSettings.setUserAgentString(ua+";iSnow");//自定义标记
 
         mWebView.loadUrl("http://blog.csdn.net");
 
@@ -105,6 +107,14 @@ public class TcpClientActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
 //                return super.shouldOverrideUrlLoading(view, request);
+                String userAgent = view.getSettings().getUserAgentString();
+                Log.d(TAG, "userAgent = " + userAgent);
+                if (userAgent.substring(userAgent.length()-";iSnow".length()).equals(";iSnow")){
+                    Log.d(TAG, "userAgent >>>>>>>>>>>>>> ##########");
+                    view.getSettings().setUserAgentString(userAgent.substring(userAgent.length()-";iSnow".length()));
+                    view.loadUrl("http://blog.csdn.net");
+                    return true;
+                }
                 Log.d(TAG, "request.getUrl = " + request.getUrl() +
                 "," + Uri.parse(request.getUrl().toString()).getHost());
                 if("m.blog.csdn.net".equals(Uri.parse(request.getUrl().toString()).getHost())){

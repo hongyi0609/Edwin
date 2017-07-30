@@ -16,7 +16,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.webkit.SslErrorHandler;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -96,6 +98,17 @@ public class TcpClientActivity extends Activity {
         String ua = webSettings.getUserAgentString();
         webSettings.setUserAgentString(ua+";iSnow");//自定义标记
 
+        if (Build.VERSION.SDK_INT >= 19) {
+            /**
+             * <p>
+             *     4.4以上系统，在onPageFinished时再恢复图片加载<br />
+             *     如果存在多张图片引用相同资源，只会加载一张
+             * </p>
+             * */
+            webSettings.setLoadsImagesAutomatically(true);
+        } else {
+            webSettings.setLoadsImagesAutomatically(false);
+        }
         mWebView.loadUrl("http://blog.csdn.net");
 
         mWebView.setWebViewClient(new WebViewClient(){
@@ -107,8 +120,9 @@ public class TcpClientActivity extends Activity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                // 结束加载网页时处理，如让对话框消失
+                if (!view.getSettings().getLoadsImagesAutomatically()) {
+                    view.getSettings().setLoadsImagesAutomatically(true);
+                }
             }
 
             @Override
@@ -193,6 +207,22 @@ public class TcpClientActivity extends Activity {
                     }
                 }
                 return response;
+            }
+        });
+
+        mWebView.setWebChromeClient(new WebChromeClient(){
+            @Override
+            public void onProgressChanged(WebView view, int newProgress) {
+                /**
+                 * 页面加载进程 <br />
+                 * 进度
+                 * @param view
+                 * @param newProgress
+                 * */
+                setTitle("页面加载中，请稍后..." + newProgress + "%");
+                setProgress(newProgress * 100);
+                if (newProgress == 100) {
+                }
             }
         });
     }

@@ -8,11 +8,20 @@
                ("欢迎："+arg);
             }
 
+            function javaCallJs(){
+               document.getElementById("content").innerHTML +=
+               "<br />java调用了JS无参数函数"；
+            }
+
+            function showDialog(){
+               alert("Hello,everyone I'm from JavaScript!");
+            }
 
     </script>
 </head>
 <body>
-<div id="content">请在上方输入你的用户名</div>
-<input type="button" value="点击Android被调用" onclick="window.Android.showToast('JS中传来的参数')"/>
+<div id="content" align="left">请在上方输入你的用户名</div>
+<input type="button" value="点击Android被调用"
+       onclick="window.Android.showToast('I am JavaScript! I deliver parameter to the method showToast(), then calling the method in the JavaScript ')"/>
 </body>
 </html>

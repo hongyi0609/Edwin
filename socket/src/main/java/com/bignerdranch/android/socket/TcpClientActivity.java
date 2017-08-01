@@ -314,7 +314,9 @@ public class TcpClientActivity extends Activity {
     }
 
     private class JSInterface {
-        // JS 需要调用的方法
+        /**
+         * js可以调用该类的方法,并给当前方法 传参
+         */
         @JavascriptInterface
         public void showToast(String arg) {
             Toast.makeText(TcpClientActivity.this, arg,Toast.LENGTH_LONG).show();

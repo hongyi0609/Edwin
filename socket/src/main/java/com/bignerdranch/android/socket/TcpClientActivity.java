@@ -14,9 +14,10 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
+import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
@@ -114,6 +115,7 @@ public class TcpClientActivity extends Activity {
             webSettings.setLoadsImagesAutomatically(false);
         }
 //        mWebView.loadUrl("http://blog.csdn.net");
+        mWebView.setDownloadListener(new MyDownloadLister());
 
         mWebView.setWebViewClient(new WebViewClient(){
             @Override
@@ -319,7 +321,38 @@ public class TcpClientActivity extends Activity {
          */
         @JavascriptInterface
         public void showToast(String arg) {
-            Toast.makeText(TcpClientActivity.this, arg,Toast.LENGTH_LONG).show();
+            Toast.makeText(TcpClientActivity.this, arg, Toast.LENGTH_LONG).show();
+        }
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        /**
+         * <p>
+         *    WebView 可返回其历史page
+         * </p>
+         * */
+        if (keyCode == KeyEvent.KEYCODE_BACK && mWebView.canGoBack()) {
+            mWebView.goBack();
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    class MyDownloadLister implements DownloadListener {
+
+        @Override
+        public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+            /**
+             * <p>下载任务主要分两种：</p>
+             * <ul>
+             *     <li>自定义下载</li>
+             *     <li>调用系统的download模块</li>
+             * </ul>
+             * */
+            Uri uri = Uri.parse(url);
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
         }
     }
 

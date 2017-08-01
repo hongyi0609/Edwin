@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -28,6 +29,7 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -95,8 +97,10 @@ public class TcpClientActivity extends Activity {
 
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        String ua = webSettings.getUserAgentString();
-        webSettings.setUserAgentString(ua+";iSnow");//自定义标记
+        mWebView.loadUrl("file:///android_asset/JavaAndJavaScriptCall.html");
+        mWebView.addJavascriptInterface(new JSInterface(), "Android");
+//        String ua = webSettings.getUserAgentString();
+//        webSettings.setUserAgentString(ua+";iSnow");//自定义标记
 
         if (Build.VERSION.SDK_INT >= 19) {
             /**
@@ -109,7 +113,7 @@ public class TcpClientActivity extends Activity {
         } else {
             webSettings.setLoadsImagesAutomatically(false);
         }
-        mWebView.loadUrl("http://blog.csdn.net");
+//        mWebView.loadUrl("http://blog.csdn.net");
 
         mWebView.setWebViewClient(new WebViewClient(){
             @Override
@@ -162,6 +166,8 @@ public class TcpClientActivity extends Activity {
                     view.getSettings().setUserAgentString(userAgent.substring(0, userAgent.length()-";iSnow".length()));
                     view.loadUrl("https://www.baidu.com");
                     return false;
+                } else {
+                    view.loadUrl(request.getUrl().toString());
                 }
                 /**
                  * 如下方案无法解决拦截Url时出现的重定向问题 <br />
@@ -227,7 +233,22 @@ public class TcpClientActivity extends Activity {
         });
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (null != savedInstanceState) {
+            mWebView.restoreState(savedInstanceState);
+        } else {
+            mWebView.loadUrl("http://www.baidu.com");
+        }
+    }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mWebView.saveState(outState);
+        Log.i(TAG, ">>>>>>>>> save State >>>>>>>>");
+    }
 
     @Override
     protected void onDestroy() {
@@ -241,6 +262,10 @@ public class TcpClientActivity extends Activity {
 
         }
         super.onDestroy();
+        mWebView.stopLoading();
+        mWebView.removeAllViews();
+        mWebView.destroy();
+        mWebView = null;
     }
 
     private void connectTcpServer() {
@@ -288,6 +313,14 @@ public class TcpClientActivity extends Activity {
         return new SimpleDateFormat("(HH:mm:ss)").format(new Date(time));
     }
 
+    private class JSInterface {
+        // JS 需要调用的方法
+        @JavascriptInterface
+        public void showToast(String arg) {
+            Toast.makeText(TcpClientActivity.this, arg,Toast.LENGTH_LONG).show();
+        }
+    }
+
     private OnClickListener l = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -304,6 +337,9 @@ public class TcpClientActivity extends Activity {
                 String time = formatDateTime(System.currentTimeMillis());
                 final String showedMsg = "self " + time + ":" + msg + "\n";
                 mMessageTextView.setText(mMessageTextView.getText() + showedMsg);
+
+                mWebView.loadUrl("javascript:javaCalls(" +
+                        "'" + mMessageEditText.getText().toString() + "'" + ")");
             }
         }
     };

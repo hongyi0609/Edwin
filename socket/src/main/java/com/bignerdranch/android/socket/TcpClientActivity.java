@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -20,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -50,6 +52,7 @@ public class TcpClientActivity extends Activity {
     private static final String TAG = TcpClientActivity.class.getSimpleName();
 
     private Button mSendButton;
+    private Button mButton;
     private TextView mMessageTextView;
     private EditText mMessageEditText;
     private WebView mWebView;
@@ -57,11 +60,11 @@ public class TcpClientActivity extends Activity {
     private PrintWriter mPrintWriter;
     private Socket mClientSocket;
 
-    private Handler mHandler = new Handler(){
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            switch (msg.what){
-                case MESSAGE_RECEIVE_NEW_MSG:{
+            switch (msg.what) {
+                case MESSAGE_RECEIVE_NEW_MSG: {
                     mMessageTextView.setText(mMessageTextView.getText() + (String) msg.obj);
                     break;
                 }
@@ -87,7 +90,7 @@ public class TcpClientActivity extends Activity {
         Intent service = new Intent(this, TCPServerService.class);
         startService(service);
 
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 connectTcpServer();
@@ -98,10 +101,10 @@ public class TcpClientActivity extends Activity {
 
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
-        mWebView.loadUrl("file:///android_asset/JavaAndJavaScriptCall.html");
-        mWebView.addJavascriptInterface(new JSInterface(), "Android");
-//        String ua = webSettings.getUserAgentString();
-//        webSettings.setUserAgentString(ua+";iSnow");//自定义标记
+        mWebView.loadUrl("file:///android_asset/test.html");
+        mWebView.addJavascriptInterface(new JsInteration(), "android");
+        //        String ua = webSettings.getUserAgentString();
+        //        webSettings.setUserAgentString(ua+";iSnow");//自定义标记
 
         if (Build.VERSION.SDK_INT >= 19) {
             /**
@@ -114,10 +117,10 @@ public class TcpClientActivity extends Activity {
         } else {
             webSettings.setLoadsImagesAutomatically(false);
         }
-//        mWebView.loadUrl("http://blog.csdn.net");
+        //        mWebView.loadUrl("http://blog.csdn.net");
         mWebView.setDownloadListener(new MyDownloadLister());
 
-        mWebView.setWebViewClient(new WebViewClient(){
+        mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
@@ -143,16 +146,19 @@ public class TcpClientActivity extends Activity {
                  * webView默认不处理Https请求
                  * */
                 handler.proceed(); // 接受信任所有网站的证书
-//                handler.cancel();  // 默认操作，不处理
-//                handler.handleMessage(null); // 其他处理
+                //                handler.cancel();  // 默认操作，不处理
+                //                handler.handleMessage(null); // 其他处理
             }
 
             @SuppressWarnings("deprecation")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-//                return super.shouldOverrideUrlLoading(view, url);
-                if("blog.csdn.net".equals(Uri.parse(url).getHost())){
+                //                return super.shouldOverrideUrlLoading(view, url);
+                if ("blog.csdn.net".equals(Uri.parse(url).getHost())) {
                     view.loadUrl("https://www.baidu.com");
+                } else {
+                    view.loadUrl(url);
+                    return false;
                 }
                 return true;
             }
@@ -160,12 +166,12 @@ public class TcpClientActivity extends Activity {
             @TargetApi(Build.VERSION_CODES.N)
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-//                return super.shouldOverrideUrlLoading(view, request);
+                //                return super.shouldOverrideUrlLoading(view, request);
                 String userAgent = view.getSettings().getUserAgentString();
                 Log.d(TAG, "userAgent = " + userAgent);
-                if (userAgent.substring(userAgent.length()-";iSnow".length()).equals(";iSnow")){
+                if (userAgent.substring(userAgent.length() - ";iSnow".length()).equals(";iSnow")) {
                     Log.d(TAG, "userAgent >>>>>>>>>>>>>> ##########");
-                    view.getSettings().setUserAgentString(userAgent.substring(0, userAgent.length()-";iSnow".length()));
+                    view.getSettings().setUserAgentString(userAgent.substring(0, userAgent.length() - ";iSnow".length()));
                     view.loadUrl("https://www.baidu.com");
                     return false;
                 } else {
@@ -174,11 +180,11 @@ public class TcpClientActivity extends Activity {
                 /**
                  * 如下方案无法解决拦截Url时出现的重定向问题 <br />
                  * */
-//                Log.d(TAG, "request.getUrl = " + request.getUrl() +
-//                "," + Uri.parse(request.getUrl().toString()).getHost());
-//                if("m.blog.csdn.net".equals(Uri.parse(request.getUrl().toString()).getHost())){
-//                    view.loadUrl("https://www.baidu.com");
-//                }
+                //                Log.d(TAG, "request.getUrl = " + request.getUrl() +
+                //                "," + Uri.parse(request.getUrl().toString()).getHost());
+                //                if("m.blog.csdn.net".equals(Uri.parse(request.getUrl().toString()).getHost())){
+                //                    view.loadUrl("https://www.baidu.com");
+                //                }
                 return false;
             }
 
@@ -218,7 +224,7 @@ public class TcpClientActivity extends Activity {
             }
         });
 
-        mWebView.setWebChromeClient(new WebChromeClient(){
+        mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 /**
@@ -231,6 +237,22 @@ public class TcpClientActivity extends Activity {
                 setProgress(newProgress * 100);
                 if (newProgress == 100) {
                 }
+            }
+        });
+
+        mButton = (Button) findViewById(R.id.click_btn);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View view) {
+                //Android调用有返回值js方法
+                mWebView.evaluateJavascript("sum(1,2)", new ValueCallback<String>() {
+                    @Override
+                    public void onReceiveValue(String value) {
+                        Log.e(TAG, "onReceiveValue value=" + value);
+                        Toast.makeText(getApplicationContext(),"sum(1+2) = " + value, Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
     }
@@ -254,7 +276,7 @@ public class TcpClientActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        if (mClientSocket != null){
+        if (mClientSocket != null) {
             try {
                 mClientSocket.shutdownInput();
                 mClientSocket.close();
@@ -272,12 +294,11 @@ public class TcpClientActivity extends Activity {
 
     private void connectTcpServer() {
         Socket socket = null;
-        while (socket == null){
+        while (socket == null) {
             try {
-                socket = new Socket("localhost",8688);
+                socket = new Socket("localhost", 8688);
                 mClientSocket = socket;
-                mPrintWriter = new PrintWriter(new BufferedWriter(
-                        new OutputStreamWriter(socket.getOutputStream())), true);
+                mPrintWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
                 mHandler.sendEmptyMessage(MESSAGE_SOCKET_CONNECTED);
                 System.out.println("connect server success");
             } catch (IOException e) {
@@ -289,12 +310,11 @@ public class TcpClientActivity extends Activity {
 
         try {
             // 接收服务器的消息
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    socket.getInputStream()));
-            while (!TcpClientActivity.this.isFinishing()){
+            BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            while (!TcpClientActivity.this.isFinishing()) {
                 String msg = br.readLine();
                 System.out.println("receive :" + msg);
-                if (msg != null){
+                if (msg != null) {
                     String time = formatDateTime(System.currentTimeMillis());
                     final String showMsg = "server " + time + ":" + msg + "\n";
                     mHandler.obtainMessage(MESSAGE_RECEIVE_NEW_MSG, showMsg).sendToTarget();
@@ -315,7 +335,7 @@ public class TcpClientActivity extends Activity {
         return new SimpleDateFormat("(HH:mm:ss)").format(new Date(time));
     }
 
-    private class JSInterface {
+    public class JsInteration {
         /**
          * js可以调用该类的方法,并给当前方法 传参
          */
@@ -323,7 +343,13 @@ public class TcpClientActivity extends Activity {
         public void showToast(String arg) {
             Toast.makeText(TcpClientActivity.this, arg, Toast.LENGTH_LONG).show();
         }
+
+        @JavascriptInterface
+        public String back() {
+            return "hello world";
+        }
     }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         /**
@@ -360,7 +386,7 @@ public class TcpClientActivity extends Activity {
         @Override
         public void onClick(View v) {
             final String msg = mMessageEditText.getText().toString();
-            if (!TextUtils.isEmpty(msg) && mPrintWriter != null){
+            if (!TextUtils.isEmpty(msg) && mPrintWriter != null) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -378,6 +404,5 @@ public class TcpClientActivity extends Activity {
             }
         }
     };
-
 
 }

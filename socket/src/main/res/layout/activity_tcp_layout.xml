@@ -20,9 +20,16 @@
             android:layout_height="match_parent"/>
         <Button
             android:id="@+id/send"
+            android:textAllCaps="false"
             android:text="send"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"/>
+        <Button
+            android:id="@+id/click_btn"
+            android:textAllCaps="false"
+            android:text="@string/call_js_sum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
     <FrameLayout

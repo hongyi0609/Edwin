@@ -1,1 +1,1 @@
-include ':app', ':socket', ':nerdlauncher'
+include ':app', ':socket', ':nerdlauncher', ':photogallery'

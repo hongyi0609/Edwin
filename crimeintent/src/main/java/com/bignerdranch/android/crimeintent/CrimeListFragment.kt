@@ -1,6 +1,7 @@
 package com.bignerdranch.android.crimeintent
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -41,34 +42,40 @@ class CrimeListFragment : Fragment() {
 
     private class CrimeAdapter(var crimes: List<Crime>, var context: Context) : RecyclerView.Adapter<CrimeHolder>() {
 
+        private lateinit var crime: Crime
+
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): CrimeHolder {
             val layoutInflater :LayoutInflater = LayoutInflater.from(context)
             val v: View = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
-            return CrimeHolder(v, context)
+            itemViewInit(v, context)
+            return CrimeHolder(v)
         }
 
         override fun onBindViewHolder(holder: CrimeHolder?, position: Int) {
-            val crime: Crime = crimes.get(position)
+            crime = crimes[position]
+
             holder?.bindCrime(crime)
         }
 
         override fun getItemCount(): Int {
             return crimes.size
         }
-    }
 
-    private class CrimeHolder(itemView :View, context: Context) : RecyclerView.ViewHolder(itemView) {
-        private val titleTextView: TextView = itemView.findViewById(R.id.list_item_crime_title_text_view)
-        private val dateTextView: TextView = itemView.findViewById(R.id.list_item_crime_date_text_view)
-        private val solvedCheckBox: CheckBox = itemView.findViewById(R.id.list_item_crime_solved_check_box)
-
-        init {
+        fun itemViewInit(itemView :View, context: Context) {
             itemView.setOnClickListener(object : View.OnClickListener {
                 override fun onClick(p0: View?) {
-                    Toast.makeText(context, titleTextView.text.toString() + " clicked!", Toast.LENGTH_LONG).show()
+//                    Toast.makeText(context, titleTextView.text.toString() + " clicked!", Toast.LENGTH_LONG).show()
+                    var i: Intent = CrimeActivity.newIntent(context, crime.mId)
+                    context.startActivity(i)
                 }
             })
         }
+    }
+
+    private class CrimeHolder(itemView :View) : RecyclerView.ViewHolder(itemView) {
+        private val titleTextView: TextView = itemView.findViewById(R.id.list_item_crime_title_text_view)
+        private val dateTextView: TextView = itemView.findViewById(R.id.list_item_crime_date_text_view)
+        private val solvedCheckBox: CheckBox = itemView.findViewById(R.id.list_item_crime_solved_check_box)
 
         fun bindCrime(crime: Crime) {
             titleTextView.text = crime.title

@@ -17,6 +17,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:hint="@string/crime_title_hint"
+        android:text="@string/app_name"
         />
     <TextView
         android:layout_width="match_parent"

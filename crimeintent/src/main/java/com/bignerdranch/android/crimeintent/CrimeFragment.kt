@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import java.util.*
 
 /**
  * Created by hongy_000 on 2017/9/23.
@@ -23,13 +24,16 @@ class CrimeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mCrime = Crime()
+//        mCrime = Crime()
+        val crimeId: UUID = activity.intent.getSerializableExtra(CrimeActivity.EXTRA_CRIME_ID) as UUID
+        mCrime = CrimeLab[activity].getCrime(crimeId)!!
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v :View = inflater?.inflate(R.layout.fragment_crime, container, false)!!
 
         mTitleField = v.findViewById(R.id.crime_title)
+        mTitleField.setText(mCrime.title)
         mTitleField.addTextChangedListener(
                 object : TextWatcher{
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -49,6 +53,7 @@ class CrimeFragment : Fragment() {
         mDateButton.isEnabled = false
 
         mSolvedCheckbox = v.findViewById(R.id.crime_solved)
+        mSolvedCheckbox.isChecked = mCrime.mSolved!!
         mSolvedCheckbox.setOnCheckedChangeListener { _, isChecked ->
             // Set the crime's solved property
             mCrime.mSolved = isChecked

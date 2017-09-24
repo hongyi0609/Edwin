@@ -29,7 +29,7 @@ class CrimeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v :View = inflater?.inflate(R.layout.fragment_crime, container, false)!!
 
-        mTitleField = v.findViewById(R.id.crime_title) as EditText
+        mTitleField = v.findViewById(R.id.crime_title)
         mTitleField.addTextChangedListener(
                 object : TextWatcher{
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -44,17 +44,20 @@ class CrimeFragment : Fragment() {
                 }
         )
 
-        mDateButton = v.findViewById(R.id.crime_date) as Button
-        mDateButton.text = mCrime.mDate.toString()
+        mDateButton = v.findViewById(R.id.crime_date)
+        mDateButton.text = mCrime.date.toString()
         mDateButton.isEnabled = false
 
-        mSolvedCheckbox = v.findViewById(R.id.crime_solved) as CheckBox
-        mSolvedCheckbox.setOnCheckedChangeListener { buttonView, isChecked ->
+        mSolvedCheckbox = v.findViewById(R.id.crime_solved)
+        mSolvedCheckbox.setOnCheckedChangeListener { _, isChecked ->
             // Set the crime's solved property
             mCrime.mSolved = isChecked
         }
 
-
         return v
+    }
+
+    companion object {
+        fun createFragment() :CrimeFragment = CrimeFragment()
     }
 }

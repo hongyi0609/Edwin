@@ -9,13 +9,13 @@ class Crime {
 
     var mId: UUID? = null
     var title: String? = null
-    var mDate: Date
-    var mSolved: Boolean = false
+    var date :Date? = null
+    var mSolved: Boolean? = false
 
     init {
         // Generate unique identifier
         mId = UUID.randomUUID()
-        mDate = Date()
+        date = Date()
     }
 
 }

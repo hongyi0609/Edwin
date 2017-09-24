@@ -32,6 +32,12 @@ class CrimeListFragment : Fragment() {
         return v
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateUI()
+        mAdapter.notifyDataSetChanged()
+    }
+
     private fun updateUI() {
         val crimeLab: CrimeLab = CrimeLab.get(activity)
         val crimes: List<Crime> = crimeLab.crimes
@@ -61,14 +67,13 @@ class CrimeListFragment : Fragment() {
             return crimes.size
         }
 
+        // itemView 初始化，监听布局点击
         fun itemViewInit(itemView :View, context: Context) {
-            itemView.setOnClickListener(object : View.OnClickListener {
-                override fun onClick(p0: View?) {
-//                    Toast.makeText(context, titleTextView.text.toString() + " clicked!", Toast.LENGTH_LONG).show()
-                    var i: Intent = CrimeActivity.newIntent(context, crime.mId)
-                    context.startActivity(i)
-                }
-            })
+            itemView.setOnClickListener {
+                //                    Toast.makeText(context, titleTextView.text.toString() + " clicked!", Toast.LENGTH_LONG).show()
+                val i: Intent = CrimeActivity.newIntent(context, crime.mId)
+                context.startActivity(i)
+            }
         }
     }
 

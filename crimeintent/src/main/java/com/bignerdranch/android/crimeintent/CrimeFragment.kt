@@ -25,7 +25,9 @@ class CrimeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        mCrime = Crime()
-        val crimeId: UUID = activity.intent.getSerializableExtra(CrimeActivity.EXTRA_CRIME_ID) as UUID
+//        val crimeId: UUID = activity.intent.getSerializableExtra(CrimeActivity.EXTRA_CRIME_ID) as UUID
+        val ARG_CRIME_ID = "com.bignerdranch.android.crimeintent.crime_id"
+        val crimeId: UUID = arguments.getSerializable(ARG_CRIME_ID) as UUID
         mCrime = CrimeLab[activity].getCrime(crimeId)!!
     }
 
@@ -63,6 +65,14 @@ class CrimeFragment : Fragment() {
     }
 
     companion object {
-        fun createFragment() :CrimeFragment = CrimeFragment()
+        fun newInstance(crimeId: UUID) :CrimeFragment{
+            val ARG_CRIME_ID = "com.bignerdranch.android.crimeintent.crime_id"
+            val args = Bundle()
+            args.putSerializable(ARG_CRIME_ID, crimeId)
+
+            val fragment = CrimeFragment()
+            fragment.arguments = args
+            return fragment
+        }
     }
 }

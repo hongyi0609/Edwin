@@ -109,6 +109,7 @@ public class RecentPhotoItems {
             private int ispublic;
             private int isfriend;
             private int isfamily;
+            private String url_s;
 
             public String getId() {
                 return id;
@@ -181,6 +182,16 @@ public class RecentPhotoItems {
             public void setIsfamily(int isfamily) {
                 this.isfamily = isfamily;
             }
+
+
+            public String getUrl_s() {
+                return url_s;
+            }
+
+            public void setUrl_s(String url_s) {
+                this.url_s = url_s;
+            }
+
         }
     }
 }

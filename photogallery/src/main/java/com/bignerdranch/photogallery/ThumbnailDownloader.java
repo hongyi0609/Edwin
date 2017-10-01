@@ -2,9 +2,11 @@ package com.bignerdranch.photogallery;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.io.IOException;
@@ -74,6 +76,7 @@ public class ThumbnailDownloader<T> extends HandlerThread {
         mRequestHandler.removeMessages(MESSAGE_DOENLOAD);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void handleRequest(final T target) {
         try {
             final String url = mRequestMap.get(target);
@@ -82,7 +85,8 @@ public class ThumbnailDownloader<T> extends HandlerThread {
                 return;
             }
 
-            byte[] bitmapBytes = new FlickrFetchr().getUrlBytes(url);
+//            byte[] bitmapBytes = new FlickrFetchr().getUrlBytes(url);
+            byte[] bitmapBytes = new FlickrFetchrOkHttp().getUrlBytes(url);
             final Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapBytes, 0, bitmapBytes.length);
             Log.i(TAG, "Bitmap created");
 

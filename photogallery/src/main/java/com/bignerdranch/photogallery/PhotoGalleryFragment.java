@@ -92,7 +92,8 @@ public class PhotoGalleryFragment extends Fragment {
 //                Log.d(TAG, "Failed to fetch URL: ", e);
 //            }
 
-            return  new FlickrFetchr().fetchItems();
+//            return  new FlickrFetchr().fetchItems();
+            return new FlickrFetchrOkHttp().fetchItems();
         }
 
         @Override

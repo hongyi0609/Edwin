@@ -10,6 +10,7 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -85,15 +86,23 @@ public class ThumbnailDownloader<T> extends HandlerThread {
                 return;
             }
 
-//            byte[] bitmapBytes = new FlickrFetchr().getUrlBytes(url);
-            byte[] bitmapBytes = new FlickrFetchrOkHttp().getUrlBytes(url);
-            final Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapBytes, 0, bitmapBytes.length);
+            final Bitmap bitmap;
+            Bitmap tmp = UtilsCache.Companion.getBitmapFromMemoryCache(url);
+            if (tmp == null) {
+                //            byte[] bitmapBytes = new FlickrFetchr().getUrlBytes(url);
+                byte[] bitmapBytes = new FlickrFetchrOkHttp().getUrlBytes(url);
+                tmp = BitmapFactory.decodeByteArray(bitmapBytes, 0, bitmapBytes.length);
+                bitmap = tmp;
+                UtilsCache.Companion.addBitmapToMemoryCache(url, bitmap);
+            } else {
+                bitmap = tmp;
+            }
             Log.i(TAG, "Bitmap created");
 
             mResponseHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (mRequestMap.get(target) != url || mHasQuit) {
+                    if (!Objects.equals(mRequestMap.get(target), url) || mHasQuit) {
                         return;
                     }
 

@@ -61,7 +61,12 @@ public class PhotoGalleryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_photo_gallery, container, false);
 
         mPhotoRecyclerView = view.findViewById(R.id.fragment_photogallery_recycler_view);
-        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+//        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        PreloadGridLayoutManager layoutManager = new PreloadGridLayoutManager(getActivity(), 3);
+        layoutManager.setOrientation(GridLayoutManager.VERTICAL);
+        layoutManager.setExtraLayoutSpace(DeviceUtils.getScreenHeight(getActivity()));
+        mPhotoRecyclerView.setLayoutManager(layoutManager);
+
 
         setupAdapter();
 

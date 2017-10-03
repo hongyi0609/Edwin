@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,6 +120,13 @@ public class PhotoGalleryFragment extends Fragment {
         public void bindDrawable(Drawable drawable) {
             mItemImageView.setImageDrawable(drawable);
         }
+
+        void bindGalleryItem(GalleryItem galleryItem) {
+            Picasso.with(getActivity())
+                    .load(galleryItem.getUrl())
+                    .placeholder(R.drawable.bill_up_close)
+                    .into(mItemImageView);
+        }
     }
 
     private class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder> {
@@ -137,9 +146,14 @@ public class PhotoGalleryFragment extends Fragment {
         @Override
         public void onBindViewHolder(PhotoHolder holder, int position) {
             GalleryItem galleryItem = mGalleryItems.get(position);
-            Drawable placeHolder = getResources().getDrawable(R.drawable.bill_up_close, getActivity().getTheme());
+
+            // 通过HandlerThread实现下载图片
+            /*Drawable placeHolder = getResources().getDrawable(R.drawable.bill_up_close, getActivity().getTheme());
             holder.bindDrawable(placeHolder);
-            mThumbnailDownloader.queueThumbnail(holder, galleryItem.getUrl());
+            mThumbnailDownloader.queueThumbnail(holder, galleryItem.getUrl());*/
+
+            // 通过Picasso库实现下载
+            holder.bindGalleryItem(galleryItem);
         }
 
         @Override

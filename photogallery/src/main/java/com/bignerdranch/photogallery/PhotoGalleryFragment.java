@@ -92,15 +92,13 @@ public class PhotoGalleryFragment extends Fragment {
     private class FetchItemsTask extends AsyncTask<Void, Void, List<GalleryItem>>{
         @Override
         protected List<GalleryItem> doInBackground(Void... params) {
-//            try {
-//                String result = new FlickrFetchr().getUrlString("http://m.weibo.cn/page/json");
-//                Log.i(TAG, "Fetched contents of URL: " + result);
-//            } catch (IOException e){
-//                Log.d(TAG, "Failed to fetch URL: ", e);
-//            }
-
+            String query = "outer space";
 //            return  new FlickrFetchr().fetchItems();
-            return new FlickrFetchrOkHttp().fetchItems();
+            if (null == query) {
+                return new FlickrFetchrOkHttp().fetchRecentPhotos();
+            } else {
+                return new FlickrFetchrOkHttp().searchPhotos(query);
+            }
         }
 
         @Override

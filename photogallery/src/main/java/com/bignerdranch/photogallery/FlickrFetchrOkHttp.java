@@ -11,17 +11,14 @@ import org.json.JSONException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 /**
  * Created by hongy_000 on 2017/9/16.
@@ -31,14 +28,18 @@ public class FlickrFetchrOkHttp {
 
     private static final String TAG = FlickrFetchrOkHttp.class.getSimpleName();
 
-    private static final String API_KEY = "aeef2a25da952db7325b46add2fb1208";
+    private static final String BASE_URL = "https://api.flickr.com/services/rest/";
+    private static final String FETCH_RECENTS_METHOD = "?method=flickr.photos.getRecent";
+    private static final String SEARCH_METHOD = "?method=flickr.photos.search";
+    private static final String API_KEY = "&api_key=aeef2a25da952db7325b46add2fb1208";
+    private static final String ENDPOINT = "&format=json&nojsoncallback=1&extras=url_s";
 
     private final OkHttpClient client = new OkHttpClient();
     private final Gson gson = new Gson();
 
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public byte[] getUrlBytes(String urlSpec) throws IOException{
+    public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
         byte[] bytes = new byte[1024];
         try {
@@ -66,17 +67,28 @@ public class FlickrFetchrOkHttp {
         return bytes;
     }
 
-    public String getUrlString(String urlSpec) throws IOException{
+    public String getUrlString(String urlSpec) throws IOException {
         return new String(getUrlBytes(urlSpec));
     }
 
-    public List<GalleryItem> fetchItems(){
+    public List<GalleryItem> fetchRecentPhotos() {
+        String url = buildUrl(FETCH_RECENTS_METHOD, null);
+        return downloadItems(url);
+    }
+
+    public List<GalleryItem> searchPhotos(String query) {
+        String url = buildUrl(SEARCH_METHOD, query);
+        return downloadItems(url);
+    }
+
+    private List<GalleryItem> downloadItems(String url) {
 
         final List<GalleryItem> items = new ArrayList<>();
 
         try {
             final Request request = new Request.Builder()
-                    .url("https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=aeef2a25da952db7325b46add2fb1208&format=json&nojsoncallback=1&extras=url_s")
+//                    .url("https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=aeef2a25da952db7325b46add2fb1208&format=json&nojsoncallback=1&extras=url_s")
+                    .url(url)
                     .build();
             Response response = client.newCall(request).execute();
             if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
@@ -106,6 +118,16 @@ public class FlickrFetchrOkHttp {
         }
 
         return items;
+    }
+
+    private String buildUrl(String method, String query) {
+        String url;
+        if (method.equals(SEARCH_METHOD)) {
+            url = BASE_URL + SEARCH_METHOD + API_KEY + ENDPOINT + "&text=" + query;
+        } else {
+            url = BASE_URL + FETCH_RECENTS_METHOD + API_KEY + ENDPOINT;
+        }
+        return url;
     }
 
     public void parseItems(List<GalleryItem> items, Response response) throws IOException, JSONException {

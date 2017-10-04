@@ -73,6 +73,7 @@ public class FlickrFetchrOkHttp {
 
     public List<GalleryItem> fetchRecentPhotos() {
         String url = buildUrl(FETCH_RECENTS_METHOD, null);
+        url = (url.replace('\n', ' ')).trim();
         return downloadItems(url);
     }
 
@@ -130,7 +131,7 @@ public class FlickrFetchrOkHttp {
         return url;
     }
 
-    public void parseItems(List<GalleryItem> items, Response response) throws IOException, JSONException {
+    private void parseItems(List<GalleryItem> items, Response response) throws IOException, JSONException {
 
         RecentPhotoItems recentPhotoItems = gson.fromJson(response.body().string(), RecentPhotoItems.class);
         for (RecentPhotoItems.PhotosBean.PhotoBean photo : recentPhotoItems.getPhotos().getPhoto()) {

@@ -113,13 +113,20 @@ public class PhotoGalleryFragment extends Fragment {
                 return false;
             }
         });
+        searchView.setOnSearchClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                String query = QueryPreferences.Companion.getStoredQuery(getActivity());
+                searchView.setQuery(query,false);
+            }
+        });
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_clear:
-                QueryPreferences.Companion.setStoredQuery(getActivity(), null);
+                QueryPreferences.Companion.setStoredQuery(getActivity(), "");
                 updateItems();
                 return true;
             default:

@@ -1,4 +1,15 @@
 apply plugin: 'com.android.application'
+buildscript{
+    repositories{
+        maven {
+            url uri('../repo')
+        }
+    }
+    dependencies{
+        classpath 'com.bignerdranch.android.gradleplugin:gradleplugin:0.0.0-alpha'
+    }
+}
+apply plugin: 'bignerdranch.gradleplugin'
 
 android {
     compileSdkVersion 25

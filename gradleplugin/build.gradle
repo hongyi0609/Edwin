@@ -1,0 +1,25 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+dependencies{
+    compile gradleApi()
+    compile localGroovy()
+}
+// 配置项目仓库
+repositories{
+    mavenCentral()
+}
+group='com.bignerdranch.android.gradleplugin'
+version='0.0.0-alpha'
+
+project.uploadArchives {
+    //任务仓库
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+//            pom.version='version'
+//            pom.artifactId='moduleName'
+//            pom.packaging='aar'
+        }
+    }
+}

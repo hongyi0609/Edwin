@@ -1,5 +1,6 @@
 package com.bignerdranch.photogallery;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -49,6 +50,10 @@ public class PhotoGalleryFragment extends Fragment {
         setHasOptionsMenu(true); //显示工具栏
 //        new FetchItemsTask().execute();
         updateItems();
+
+//        Intent i = PollService.Companion.newIntent(getActivity());
+//        getActivity().startService(i);
+//        PollService.Companion.setServiceAlarm(getActivity(), true);
 
         Handler responseHandler = new Handler();
         mThumbnailDownloader = new ThumbnailDownloader<>(responseHandler);
@@ -120,6 +125,13 @@ public class PhotoGalleryFragment extends Fragment {
                 searchView.setQuery(query,false);
             }
         });
+
+        MenuItem toggleItem = menu.findItem(R.id.menu_item_toggle_polling);
+        if (PollService.Companion.isServiceAlarmOn(getActivity())) {
+            toggleItem.setTitle(R.string.stop_polling);
+        } else {
+            toggleItem.setTitle(R.string.start_polling);
+        }
     }
 
     @Override
@@ -128,6 +140,11 @@ public class PhotoGalleryFragment extends Fragment {
             case R.id.menu_item_clear:
                 QueryPreferences.Companion.setStoredQuery(getActivity(), "");
                 updateItems();
+                return true;
+            case R.id.menu_item_toggle_polling:
+                boolean shouldStartAlarm = !PollService.Companion.isServiceAlarmOn(getActivity());
+                PollService.Companion.setServiceAlarm(getActivity(), shouldStartAlarm);
+                getActivity().invalidateOptionsMenu();//控制定时器启动和停止
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

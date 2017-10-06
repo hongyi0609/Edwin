@@ -9,7 +9,7 @@ class GradlePluginImpl implements Plugin<Project> {
         System.out.println("========================")
         System.out.println("hello gradle plugin!")
         System.out.println("========================")
-        project.task('testTask') << {
+        project.task('testTask').doLast {
             println("Hello, test Task with plugin!")
         }
     }

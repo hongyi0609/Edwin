@@ -4,10 +4,13 @@ apply plugin: 'maven'
 dependencies{
     compile gradleApi()
     compile localGroovy()
+    // 插件工程中 使用到了javassist
+    compile 'org.javassist:javassist:3.22.0-CR2'
 }
 // 配置项目仓库
 repositories{
-    mavenCentral()
+//    mavenCentral()
+    jcenter()
 }
 group='com.bignerdranch.android.gradleplugin'
 version='0.0.0-alpha'
